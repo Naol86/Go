@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func update(x *int) {
+var update = func(x *int) {
 	*x = 12
 }
 
