@@ -15,10 +15,9 @@ var NewBook models.Book
 
 func GetBooks(w http.ResponseWriter, r *http.Request) {
 	books := models.GetAllBooks()
-	res, _ := json.Marshal(books)
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(res)
+	json.NewEncoder(w).Encode(books)
 }
 
 func GetBook(w http.ResponseWriter, r *http.Request) {
