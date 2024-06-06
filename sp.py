@@ -1,30 +1,30 @@
-import speedtest
-import schedule
-import time
+import os
+from supabase import create_client, Client
+from dotenv import load_dotenv
 
-def run_speedtest():
-    st = speedtest.Speedtest()
-    st.get_best_server()
-    download_speed = st.download() / 1e+6  # Convert to Mbps
-    upload_speed = st.upload() / 1e+6  # Convert to Mbps
-    ping = st.results.ping
+# Load environment variables from a .env file (optional)
+load_dotenv()
 
-    print(f"Download Speed: {download_speed:.2f} Mbps")
-    print(f"Upload Speed: {upload_speed:.2f} Mbps")
-    print(f"Ping: {ping:.2f} ms")
-    print("-" * 30)
+SUPABASE_URL = "https://hlfpunkeyhenzvvpcipl.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhsZnB1bmtleWhlbnp2dnBjaXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc3MDI3NDcsImV4cCI6MjAzMzI3ODc0N30.K1Xy_9mmuJR4fy00mk7W9pQp-fe_AKM46e6m31kLnJ4"
 
-def schedule_speedtest():
-    # Run the speed test initially
-    run_speedtest()
+# Initialize the Supabase client
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-    # Schedule the speed test every minute
-    schedule.every(1).minute.do(run_speedtest)
+def upload_file(bucket_name, file_path):
+    with open(file_path, "rb") as file:
+        file_content = file.read()
 
-    # Run the scheduler indefinitely
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    file_name = os.path.basename(file_path)
+    response = supabase.storage.from_(bucket_name).upload(file_name, file_content)
+    
+    if response.get("error"):
+        print(f"Error uploading file: {response['error']}")
+    else:
+        print(f"File uploaded successfully: {response['data']}")
 
-if __name__ == "__main__":
-    schedule_speedtest()
+# Example usage
+bucket_name = "bookstore"  # Replace with your bucket name
+file_path = "/home/naol/Documents/program/Go/os4.pptx"  # Replace with the path to your file
+
+upload_file(bucket_name, file_path)
