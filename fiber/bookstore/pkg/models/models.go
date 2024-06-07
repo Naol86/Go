@@ -186,4 +186,10 @@ func GetAllBooks(c *fiber.Ctx) error {
 	return c.JSON(books)
 }
 
+
+func GetBooks(c *fiber.Ctx) error {
+	var books []Books
+	DB.Find(&books)
+	return c.JSON(books)
+}
 // end books

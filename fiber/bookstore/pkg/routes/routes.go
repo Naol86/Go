@@ -22,5 +22,6 @@ func Routes(app *fiber.App) {
 	// book routes
 	app.Post("/books/:course_id", models.CreateBook)
 	app.Get("/books/:course_id", models.GetAllBooks)
+	app.Get("/books", models.GetBooks)
 
 }
