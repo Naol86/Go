@@ -55,6 +55,7 @@ type Books struct {
 	Description  string `json:"description"`
 	File         string `json:"file"`
 	Image        string `json:"image"`
+	Author			 string `json:"author"`
 	CourseID     uint   `json:"course_id"`
 }
 
@@ -91,6 +92,17 @@ func GetAllSchools(c *fiber.Ctx) error {
 	return c.JSON(schools)
 }
 
+func DeleteSchool(c *fiber.Ctx) error {
+	SId := c.Params("school_id")
+	s_id, err := strconv.ParseUint(SId, 10, 64)
+	if err != nil {
+		return c.Status(400).SendString("school id not found")
+	}
+	var school School
+	DB.Where("id = ?", s_id).Delete(&school)
+	return c.JSON(school)
+}
+
 
 // end school
 
@@ -123,6 +135,17 @@ func GetDepartments(c *fiber.Ctx) error {
 	return c.JSON(departments)
 }
 
+func DeleteDepartment(c *fiber.Ctx) error {
+	DId := c.Params("department_id")
+	d_id, err := strconv.ParseUint(DId, 10, 64)
+	if err != nil {
+		return c.Status(400).SendString("department id not found")
+	}
+	var department Department
+	DB.Where("id = ?", d_id).Delete(&department)
+	return c.JSON(department)
+}
+
 // end department
 
 // start course
@@ -153,6 +176,18 @@ func GetAllCourse(c *fiber.Ctx) error {
 	DB.Where("department_id = ?", c_id).Find(&courses)
 	return c.JSON(courses)
 }
+
+func DeleteCourse(c *fiber.Ctx) error {
+	CId := c.Params("course_id")
+	c_id, err := strconv.ParseUint(CId, 10, 64)
+	if err != nil {
+		return c.Status(400).SendString("course id not found")
+	}
+	var course Course
+	DB.Where("id = ?", c_id).Delete(&course)
+	return c.JSON(course)
+}
+
 // end course
 
 
@@ -189,7 +224,26 @@ func GetAllBooks(c *fiber.Ctx) error {
 
 func GetBooks(c *fiber.Ctx) error {
 	var books []Books
-	DB.Find(&books)
-	return c.JSON(books)
+	// DB.Order("RANDOM()").Limit(5).Find(&books)
+	// return c.JSON(books)
+	result := DB.Order("RAND()").Limit(5).Find(&books)
+    if result.Error != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "error": "Failed to retrieve books",
+        })
+    }
+    return c.JSON(books)
 }
+
+func DeleteBook(c *fiber.Ctx) error {
+	BId := c.Params("book_id")
+	b_id, err := strconv.ParseUint(BId, 10, 64)
+	if err != nil {
+		return c.Status(400).SendString("book id not found")
+	}
+	var book Books
+	DB.Where("id = ?", b_id).Delete(&book)
+	return c.JSON(book)
+}
+
 // end books

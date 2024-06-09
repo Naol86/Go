@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Books</title>
+    <style>
+      .book {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      .loading,
+      .error {
+        font-weight: bold;
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="books-container">
+      <div class="loading">Loading...</div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchBooks();
+      });
+
+      async function fetchBooks() {
+        const booksContainer = document.getElementById("books-container");
+        try {
+          const response = await fetch("http://127.0.0.1:8000/books");
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          displayBooks(data);
+        } catch (error) {
+          displayError(error.message);
+        }
+      }
+
+      function displayBooks(books) {
+        const booksContainer = document.getElementById("books-container");
+        booksContainer.innerHTML = "";
+        books.forEach((book) => {
+          const bookDiv = document.createElement("div");
+          bookDiv.className = "book";
+          bookDiv.innerHTML = `
+          <h3>${book.title}</h3>
+          <p>Author: ${book.author}</p>
+          <p>${book.description}</p>
+        `;
+          booksContainer.appendChild(bookDiv);
+        });
+      }
+
+      function displayError(errorMessage) {
+        const booksContainer = document.getElementById("books-container");
+        booksContainer.innerHTML = `<div class="error">Error: ${errorMessage}</div>`;
+      }
+    </script>
+  </body>
+</html>
