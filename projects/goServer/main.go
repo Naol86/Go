@@ -6,45 +6,32 @@ import (
 	"net/http"
 )
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/hello" {
-		http.Error(w, "404 not found.", http.StatusNotFound)
-		return
+func formHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		fmt.Fprintf(w, "Parse form() err: %v", err);
+		return;
 	}
-	if r.Method != "GET" {
-		http.Error(w, "Method is not supported.", http.StatusNotFound)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, "Hello, World!")
+	fmt.Fprintf(w, "post request successful");
+	name := r.FormValue("name");
+	address := r.FormValue(("address"));
+	fmt.Fprintf(w, "Name is %v", name);
+	fmt.Fprintf(w, "Address is %v", address);
 }
 
-
-func formHandler (w http.ResponseWriter, r *http.Request) {
-
-	if err := r.ParseForm(); err != nil {
-		fmt.Fprintf(w, "ParseForm() err: %v", err)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, "Post request successful\n")
-	name := r.FormValue("name")
-	address := r.FormValue("address")
-	fmt.Fprintf(w, "Name = %s\n address = %v\n", name, address)
-
-
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "hello world")
 }
 
 func main() {
-	fileServer := http.FileServer(http.Dir("./static"))
+	fmt.Println("hello")
 
-	http.Handle("/", fileServer)
-	http.HandleFunc("/form", formHandler)
-	http.HandleFunc("/hello", helloHandler)
+	fileServer := http.FileServer(http.Dir("./static"));
+	http.Handle("/", fileServer);
+	http.HandleFunc("/form", formHandler);
+	http.HandleFunc("/hello", helloHandler);
 
-	fmt.Println("Server is listening...")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal(err)
 	}
+
 }

@@ -2,14 +2,9 @@ package main
 
 import "fmt"
 
-var update = func(x *int) {
-	*x = 12
-}
-
 func main() {
-	x := 10
-	var array = []int{1,2,3}
-	update(&x)
-	array = append(array, 9);
-	fmt.Println(x, array)
+	// create a new array of numbers
+	var numbers []int;
+	numbers = append(numbers, 1);
+	fmt.Println(numbers);
 }
