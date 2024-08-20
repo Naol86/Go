@@ -23,25 +23,28 @@ func CreateUser(c *fiber.Ctx) error {
 	var newUser models.User;
 	newUser.Name = user.Name;
 	newUser.Email = user.Email;
+	newUser.Username = user.Username;
 	newUser.Password = hash;
 
 	Id,_ := collection.InsertOne(c.Context(), newUser);
 
 	// newUser,_ := collection.InsertOne(c.Context(), user);
 	// user.ID = newUser.InsertedID.(primitive.ObjectID);
-
+	
+	
 	response := fiber.Map{
 		"message": "User created successfully",
 		"success": true,
 		"user": fiber.Map{
 			"id": Id.InsertedID.(primitive.ObjectID),
 			"name": user.Name,
+			"username": user.Username,
 			"email": user.Email,
 		},
 		"errors": nil,
 		"count": 0,
 	}
 
-
+	c.Status(fiber.StatusCreated)
 	return c.JSON(response);
 }

@@ -1,15 +1,14 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/naol86/mon-go/auth"
 	"github.com/naol86/mon-go/models"
 	"github.com/naol86/mon-go/utils"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func LoginUser(c *fiber.Ctx) error {
+func SigninUser(c *fiber.Ctx) error {
 	var user models.User
 	var credentials models.UserLoginForm;
 	if err := c.BodyParser(&credentials); err != nil {
@@ -34,9 +33,17 @@ func LoginUser(c *fiber.Ctx) error {
 		})
 	}
 
+	accessToken, err := auth.GenerateToken(user.Email, user.Username);
+	if err != nil {
+		return c.SendString("Error generating token");
+	}
 
-	fmt.Println(user);
-	return c.JSON(fiber.Map{
-		"message": "User found",
-	})
+	response := fiber.Map{
+		"message": "Login successful",
+		"success": true,
+		"accessToken": accessToken,
+		"user": user,
+	}
+
+	return c.JSON(response)
 }
